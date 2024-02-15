@@ -1,7 +1,201 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 1 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184/284A Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Homework 1: Rasterizer</h1>
+<h2 align="middle">Helena Su</h2>
+
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>Give a high-level overview of what you implemented in this homework Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.</p>
+
+<h2 align="middle">Section I: Rasterization</h2>
+
+<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+<ol>
+  <li>Walk through how you rasterize triangles in your own words.</li>
+  <p>I first ordered the vertices in anti-clockwise order by looking at the slopes of the 2 vectors formed with 3 vertices. This ensures the "insideness". 
+    Then, I did a for loop checking and perform 3 line tests (normal vector dot point vector >= 0) for each point. If it is inside of all three lines, it is considered inside a triangle and colored.
+  </p>
+  <li>Explain how your algorithm is no worse than one that checks each sample within the bounding box of the triangle.</li>
+  <p>I find the X min, X max, Y min, and Y max as the start and end points of my for loop. This reduces the loop size. </p>
+  <li>Show a png screenshot of basic/test4.svg with the default viewing parameters and with the pixel inspector centered on an interesting part of the scene.</li>
+  <p>wow, so jaggy!</p>
+  <img src="images/Screenshot 2024-02-12 at 11.04.00 PM.jpg" align="middle" width="400px"/>
+</ol>
+
+
+<h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+<ol>
+  <li>Walk through your supersampling algorithm and data structures. Why is supersampling useful? What modifications did you make to the rasterization pipeline in the process? Explain how you used supersampling to antialias your triangles.</li>
+  <p>I adjusted the for loop from task 1 and made it sample multiple times frequently, populating the sample buffer array. Then, to resolve sample to frame, I looped through each pixel and for each pixel, average all the color of supersamples within that pixel. 
+    Supersample is useful because they make edges look smoother on a square pixel screen (less jaggy).
+    Changes through pipeline is mainly updating the sample buffer and taking the averages during resolution.
+    It is antialiasing because we went through the process of downsampling from a higher resolution. This blurs the pixel and potentially causes antialiasing.
+  </p>
+  <li>Show png screenshots of basic/test4.svg with the default viewing parameters and sample rates 1, 4, and 16 to compare them side-by-side. Position the pixel inspector over an area that showcases the effect dramatically; for example, a very skinny triangle corner. Explain why these results are observed.</li>
+  <div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <img src="images/Screenshot 2024-02-13 at 9.31.04 AM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 1.</figcaption>
+        </td>
+        <td>
+          <img src="images/Screenshot 2024-02-13 at 9.31.06 AM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 4.</figcaption>
+        </td>
+      </tr>
+      <br>
+      <tr>
+        <td>
+          <img src="images/Screenshot 2024-02-13 at 9.31.07 AM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 9.</figcaption>
+        </td>
+        <td>
+          <img src="images/Screenshot 2024-02-13 at 9.31.09 AM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 16.</figcaption>
+        </td>
+      </tr>
+    </table>
+  </div>
+</ol>
+
+<h3 align="middle">Part 3: Transforms</h3>
+<ol>
+  <li>Create an updated version of svg/transforms/robot.svg with cubeman doing something more interesting, like waving or running. Feel free to change his colors or proportions to suit your creativity. Save your svg file as my_robot.svg in your docs/ directory and show a png screenshot of your rendered drawing in your write-up. Explain what you were trying to do with cubeman in words..</li>
+  <p>I made a simple dance move by applying rotation and translation.
+  </p>
+  <img src="images/Screenshot 2024-02-13 at 12.36.10 AM.jpg" align="middle" width="400px"/>
+</ol>
+
+<h2 align="middle">Section II: Sampling</h2>
+
+<h3 align="middle">Part 4: Barycentric coordinates</h3>
+<ol>
+  <li>Explain barycentric coordinates in your own words and use an image to aid you in your explanation. One idea is to use a svg file that plots a single triangle with one red, one green, and one blue vertex, which should produce a smoothly blended color triangle.</li>
+  <p>it is a weighted average of three vertices, and a special coordinate system where you have three axis but in 2d. 
+  </p>
+  <img src="images/Screenshot 2024-02-13 at 9.27.43 AM.jpg" align="middle" width="400px"/>
+  <li>Show a png screenshot of svg/basic/test7.svg with default viewing parameters and sample rate 1. If you make any additional images with color gradients, include them.</li>
+  <img src="images/Screenshot 2024-02-13 at 12.39.55 AM.jpg" align="middle" width="400px"/></ol>
+
+<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+
+<ol>
+  <li>Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. Briefly discuss the two different pixel sampling methods, nearest and bilinear.</li>
+  <p>pixel samping in texture context mainly involves change of coordinates. We need to map screen space (x,y) to texture sapce(u,v). Scaling and relative coordinates (barycentric) are involved.
+     Nearest-neighbor sampling is simpy change of coordinates and finding the nearest integer.
+     Bilinear is a little bit complicated because it is the weighted average of closest four pixels. It is like a square barycentric coordinate. 
+  </p>
+  <li>Check out the svg files in the svg/texmap/ directory. Use the pixel inspector to find a good example of where bilinear sampling clearly defeats nearest sampling. Show and compare four png screenshots using nearest sampling at 1 sample per pixel, nearest sampling at 16 samples per pixel, bilinear sampling at 1 sample per pixel, and bilinear sampling at 16 samples per pixel.</li>
+  <div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <img src="images/Screenshot 2024-02-14 at 7.12.51 PM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 1. nearest pixel.</figcaption>
+        </td>
+        <td>
+          <img src="images/Screenshot 2024-02-14 at 7.13.00 PM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 16. nearest pixel.</figcaption>
+        </td>
+      </tr>
+      <br>
+      <tr>
+        <td>
+          <img src="images/Screenshot 2024-02-14 at 7.55.05 PM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 1. bilinear pixel.</figcaption>
+        </td>
+        <td>
+          <img src="images/Screenshot 2024-02-14 at 7.54.23 PM.jpg" align="middle" width="400px"/>
+          <figcaption align="middle">sample rate 16. bilinear pixel.</figcaption>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <li>Comment on the relative differences. Discuss when there will be a large difference between the two methods and why.</li>
+  <p>Bilinear is smoother than nearest pixel sampling. the difference is obvious in lower sampling rates, since supersample does a similar averaging as bilinear. </p>
+</ol>
+<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+
+<ol>
+  <li>Explain level sampling in your own words and describe how you implemented it for texture mapping.</li>
+  <p> we find dx and dy in screen space, change it coordinates to find du, dv, and pick the larger one of du, dv to decide how much to downsample. Level is calculated by taking log 2.
+    depending on different leveling method, we can either always use full resolution (level 0 texture map), or find the nearest level, or using weighted average between the closest integer levels. </p>
+  <li>You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques.</li>
+  <p> speed: pixel sampling > level sampling > supersample <br>
+      memory: supersample > level > pixel <br>
+      antialias: (better) supersample > level > pixel (worse)  <br>
+      antialias often means performance. To have a better performance, more memory is usually requred and more time is needed. 
+  </p>
+  <li>Using a png file you find yourself, show us four versions of the image, using the combinations of L_ZERO and P_NEAREST, L_ZERO and P_LINEAR, L_NEAREST and P_NEAREST, as well as L_NEAREST and P_LINEAR.</li>
+  <ul>
+    <li>
+      To use your own png, make a copy of one of the existing svg files in svg/texmap/ (or create your own modelled after one of the provided svg files). Then, near the top of the file, change the texture filename to point to your own png. From there, you can run ./draw and pass in that svg file to render it and then save a screenshot of your results.
+    </li>
+    <li>
+      Note: Choose a png that showcases the different sampling effects well. You may also want to zoom in/out, use the pixel inspector, etc. to demonstrate the differences.
+    </li>
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/Screenshot 2024-02-14 at 7.44.58 PM.jpg" align="middle" width="400px"/>
+            <figcaption align="middle">L_ZERO and P_NEAREST</figcaption>
+          </td>
+          <td>
+            <img src="images/Screenshot 2024-02-14 at 7.45.17 PM.jpg" align="middle" width="400px"/>
+            <figcaption align="middle">L_ZERO and P_LINEAR</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+            <img src="images/Screenshot 2024-02-14 at 7.46.45 PM.jpg" align="middle" width="400px"/>
+            <figcaption align="middle">L_NEAREST and P_NEAREST,</figcaption>
+          </td>
+          <td>
+            <img src="images/Screenshot 2024-02-14 at 7.47.27 PM.jpg" align="middle" width="400px"/>
+            <figcaption align="middle">L_NEAREST and P_LINEAR</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </ul>
+</ol>
+
+<h2 align="middle">Section III: Art Competition</h2>
+<h3 align="middle">Part 7: Draw something interesting!</h3>
+
+<p>If you are not participating in the optional art competition, don't worry about this section!</p>
+<img src="images/JPEG image.JPEG" align="middle" width="400px"/>
+<p>I produced this by messing with the sampling offset.</p>
+
+</body>
 </html>
